@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pinned Scrollytelling — reproduction du pattern thelma.pet</title>
+  <meta name="description" content="Reproduction pédagogique de la section épinglée pilotée par la progression du scroll (pattern type thelma.pet)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Special+Gothic+Expanded+One&family=Caveat:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============ HERO (amorce de scroll) ============ -->
+  <header class="hero">
+    <p class="hero__eyebrow">Pattern · pinned scrollytelling</p>
+    <h1 class="hero__title">Un seul bloc figé.<br>Trois scènes au scroll.</h1>
+    <p class="hero__sub">Reproduction de la section épinglée de thelma.pet. Scrollez : le panneau reste collé, et c'est votre <strong>progression</strong> (0 → 1) qui pilote tout le reste.</p>
+    <span class="hero__cue" aria-hidden="true">Scrollez ↓</span>
+  </header>
+
+  <!-- ============ LA SECTION ÉPINGLÉE ============
+       Conteneur HAUT (360vh) = c'est lui qui crée la distance de scroll.
+       L'enfant .pin (sticky, h-screen) reste collé pendant tout ce temps. -->
+  <section class="pin-section" data-pin-section aria-label="Comment ça marche">
+    <div class="pin">
+
+      <!-- (a) Calques de FOND en dégradé : se relaient en opacité -->
+      <div class="bg" data-grad="0" aria-hidden="true"></div>
+      <div class="bg bg--2" data-grad="1" aria-hidden="true"></div>
+      <div class="bg bg--3" data-grad="2" aria-hidden="true"></div>
+
+      <div class="pin__inner">
+
+        <!-- (b) Colonne TEXTE : 3 panneaux empilés qui se croisent en fondu -->
+        <div class="col col--text">
+          <article class="panel" data-step="0">
+            <span class="panel__eyebrow">Étape 01</span>
+            <h2 class="panel__title">Déposez<br>une photo</h2>
+            <p class="panel__sub">Glissez un cliché de votre compagnon. Un seul suffit, même pris au téléphone.</p>
+          </article>
+          <article class="panel" data-step="1">
+            <span class="panel__eyebrow">Étape 02</span>
+            <h2 class="panel__title">Explorez<br>les styles</h2>
+            <p class="panel__sub">Notre studio décline le portrait en plusieurs styles signés. À vous de choisir.</p>
+          </article>
+          <article class="panel" data-step="2">
+            <span class="panel__eyebrow">Étape 03</span>
+            <h2 class="panel__title">Encadré,<br>livré</h2>
+            <p class="panel__sub">On imprime, on encadre, on expédie. Une pièce qui dure toute une vie.</p>
+          </article>
+        </div>
+
+        <!-- (c) Colonne VISUEL : 3 scènes empilées qui se croisent en fondu -->
+        <div class="col col--visual">
+
+          <!-- Scène 1 : drag & drop — la carte est "tenue" puis se pose dans la zone -->
+          <div class="scene" data-step="0">
+            <div class="dropzone">
+              <div class="dropzone__cue" data-cue>
+                <span class="ring"></span>
+                <span class="ring ring--2"></span>
+                <span class="dropzone__hint">Glissez une photo&nbsp;·&nbsp;JPG</span>
+              </div>
+              <figure class="photo photo--drag" data-photo>
+                <span class="photo__img" data-pet>🐕</span>
+                <figcaption class="photo__bar"><span>aito.jpg</span><span>2,4 Mo</span></figcaption>
+                <!-- scanner d'analyse IA : glow qui respire + anneaux "sonar" qui pulsent (= ça charge) -->
+                <span class="scan" data-halos aria-hidden="true">
+                  <span class="scan__core"></span>
+                  <span class="scan__ring"></span>
+                  <span class="scan__ring scan__ring--2"></span>
+                </span>
+                <!-- pastille "Analyse IA" + voyant + points de chargement -->
+                <span class="analyse" data-analyse aria-hidden="true">
+                  <span class="analyse__pill">
+                    <span class="analyse__dot"></span>Analyse IA
+                    <span class="ld"><b></b><b></b><b></b></span>
+                  </span>
+                </span>
+                <!-- curseur macOS : arrive par la droite, se centre, puis glisse la carte -->
+                <span class="cursor cursor--photo" data-cursor1 aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="22" height="22">
+                    <path d="M5 3l14 7.5-6 1.4-1.4 6L5 3z" fill="#1c1a17" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </figure>
+            </div>
+          </div>
+
+          <!-- Scène 2 : la photo explose en grille de styles, le curseur sélectionne la 1re -->
+          <div class="scene" data-step="1">
+            <div class="grid">
+              <span class="tile tile--sepia"  data-tile><span class="tile__pet" data-pet>🐕</span></span>
+              <span class="tile tile--mono"   data-tile><span class="tile__pet" data-pet>🐕</span></span>
+              <span class="tile tile--pop"    data-tile><span class="tile__pet" data-pet>🐕</span></span>
+              <span class="tile tile--ink"    data-tile><span class="tile__pet" data-pet>🐕</span></span>
+              <span class="tile tile--pastel" data-tile><span class="tile__pet" data-pet>🐕</span></span>
+              <span class="tile tile--gold"   data-tile><span class="tile__pet" data-pet>🐕</span></span>
+              <!-- overlays NON filtrés (hors des tuiles) : onde de clic + curseur -->
+              <span class="tap" data-select aria-hidden="true"></span>
+              <span class="cursor cursor--select" data-cursor2 aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22">
+                  <path d="M5 3l14 7.5-6 1.4-1.4 6L5 3z" fill="#1c1a17" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <!-- Scène 3 : le cadre est "drag & droppé" depuis le coin sup-droit, puis redressé -->
+          <div class="scene" data-step="2">
+            <figure class="frame" data-frame>
+              <span class="frame__art" data-pet>🐕</span>
+              <figcaption class="frame__badge" data-badge>Livré sous 5 jours</figcaption>
+            </figure>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- (d) Indicateur d'étapes -->
+      <ol class="dots" aria-hidden="true">
+        <li class="dot"></li><li class="dot"></li><li class="dot"></li>
+      </ol>
+
+      <!-- (e) HUD pédagogique : affiche la valeur de progression en direct -->
+      <output class="hud" id="hud">progress 0.00 · pos 0.00 · étape 1/3</output>
+
+    </div>
+  </section>
+
+  <!-- ============ OUTRO ============ -->
+  <footer class="outro">
+    <h2 class="outro__title">C'est tout le secret.</h2>
+    <p class="outro__sub">Un parent très haut, un enfant <code>sticky</code>, des calques qui se croisent selon le % de scroll. Ouvrez <code>script.js</code> : ~30 lignes.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

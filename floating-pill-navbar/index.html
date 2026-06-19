@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Floating Pill Navbar — démo</title>
+  <meta name="description" content="Reproduction de la navbar flottante qui se condense au scroll (pattern type keytomic / Framer)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============ NAVBAR FLOTTANTE ============ -->
+  <header class="nav" id="nav" data-state="top">
+    <div class="nav__inner">
+      <a class="nav__brand" href="#" aria-label="Accueil">
+        <span class="nav__orb" aria-hidden="true"></span>
+        <span class="nav__word">Aurora</span>
+      </a>
+
+      <nav class="nav__links" aria-label="Navigation principale">
+        <a href="#" class="nav__link">Solutions
+          <svg class="nav__caret" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#features" class="nav__link">Fonctionnalités</a>
+        <a href="#pricing" class="nav__link">Tarifs</a>
+        <a href="#" class="nav__link">Blog</a>
+      </nav>
+
+      <div class="nav__actions">
+        <a href="#" class="btn btn--ghost">Connexion
+          <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7v10H7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#" class="btn btn--solid">Essai gratuit
+          <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <button class="nav__burger" id="burger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <p class="hero__eyebrow">Pattern navbar flottante</p>
+    <h1 class="hero__title">La navbar qui se<br>condense au scroll.</h1>
+    <p class="hero__sub">Scrollez vers le bas : la barre se rétracte en pilule flottante, fond frosté et ombre douce. Remontez en haut : elle se redéploie.</p>
+    <div class="hero__cta">
+      <a href="#" class="btn btn--solid btn--lg">Commencer
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#" class="btn btn--ghost btn--lg">Voir la démo</a>
+    </div>
+    <span class="hero__scroll" aria-hidden="true">Scrollez ↓</span>
+  </section>
+
+  <!-- ============ SECTIONS DE REMPLISSAGE (pour avoir du scroll) ============ -->
+  <main class="content">
+    <section class="block" id="features">
+      <p class="block__eyebrow">Fonctionnalités</p>
+      <h2 class="block__title">Pensée pour le scroll.</h2>
+      <div class="cards">
+        <article class="card"><h3>Transition fluide</h3><p>Largeur, rayon, ombre et flou animés ensemble via une seule transition CSS.</p></article>
+        <article class="card"><h3>Backdrop frosté</h3><p>Le fond translucide laisse deviner le contenu qui défile derrière la pilule.</p></article>
+        <article class="card"><h3>Performant</h3><p>Écouteur de scroll passif + rAF, aucune secousse au défilement.</p></article>
+      </div>
+    </section>
+
+    <section class="block block--alt" id="pricing">
+      <p class="block__eyebrow">Tarifs</p>
+      <h2 class="block__title">Une seule formule.</h2>
+      <div class="cards">
+        <article class="card"><h3>Starter</h3><p>Tout ce qu'il faut pour démarrer, sans carte bancaire.</p></article>
+        <article class="card"><h3>Pro</h3><p>Pour les équipes qui veulent aller plus vite.</p></article>
+        <article class="card"><h3>Scale</h3><p>Limites étendues et support prioritaire.</p></article>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2 class="block__title">Continuez à scroller…</h2>
+      <p class="block__sub">La barre reste flottante tant que vous n'êtes pas tout en haut.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Démo navbar flottante — pattern type keytomic / Framer.</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
