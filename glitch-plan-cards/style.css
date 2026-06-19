@@ -1,0 +1,217 @@
+/* ============================================================
+   Glitch Plan Cards — démo
+   Deux effets, repris du portail Nous Research :
+     1) SURVOL  → bordure dégradée animée (« arc-border », 100% CSS).
+     2) SOURIS  → l'image de la carte se DÉCHIRE au mouvement
+        (datamosh : déplacement par bandes + aberration chromatique),
+        rendu par un shader WebGL piloté par la VITESSE du curseur.
+   ============================================================ */
+
+:root {
+  --bg:     #120a02;
+  --ink:    #ffffff;
+  --muted:  rgba(255, 255, 255, 0.62);
+  --line:   rgba(255, 255, 255, 0.12);
+  --amber:  #ffac02;
+
+  /* Bordure « arc » (identique à Nous) */
+  --arc-c0: var(--ink);
+  --arc-c1: var(--amber);
+  --arc-c2: #170d02;
+  --arc-width: 1.4px;
+  --arc-angle: 160deg;
+  --arc-flow: 2.23s;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(255, 172, 2, 0.10), transparent 55%),
+    var(--bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5vh 20px;
+}
+
+.wrap { width: 100%; max-width: 1180px; }
+
+.head { text-align: center; margin-bottom: 2.4rem; }
+.head__title { font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 600; letter-spacing: -0.02em; }
+.head__sub { margin: 0.7rem auto 0; max-width: 48ch; color: var(--muted); font-size: 0.96rem; }
+
+/* ---------- Grille ---------- */
+.plans { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; align-items: start; }
+.plan  { display: flex; flex-direction: column; gap: 12px; }
+
+/* ---------- Carte (l'image) ---------- */
+.card {
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #0c0702;             /* fond si le canvas n'a pas (encore) chargé */
+  cursor: pointer;
+  padding: 0;
+  overflow: visible;               /* laisse dépasser la bordure arc */
+  transition: transform 0.3s, border-color 0.3s;
+}
+.card:hover { transform: translateY(-3px); }
+.card:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+/* Le canvas WebGL, découpé aux coins arrondis */
+.card__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+.card__gl { display: block; width: 100%; height: 100%; }
+
+/* ---------- 1 · SURVOL : bordure « arc » dégradée ---------- */
+.card__arc {
+  position: absolute;
+  inset: -1px;
+  z-index: 2;
+  border-radius: inherit;
+  padding: var(--arc-width);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background:
+    linear-gradient(
+      var(--arc-angle),
+      transparent 0%,
+      var(--arc-c0) 15%, var(--arc-c1) 20%, var(--arc-c2) 25%,
+      transparent 35%, transparent 40%,
+      var(--arc-c0) 55%, var(--arc-c1) 60%, var(--arc-c2) 65%,
+      transparent 75%, transparent 80%,
+      var(--arc-c0) 95%, var(--arc-c1) 100%
+    );
+  background-size: 300% 300%;
+  animation: arc-flow var(--arc-flow) linear infinite;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+}
+.card:hover .card__arc,
+.plan.is-selected .card__arc { opacity: 1; }
+
+@keyframes arc-flow {
+  0%   { background-position: 15% 15%; }
+  100% { background-position: 75% 75%; }
+}
+
+/* ---------- Pastille radio ---------- */
+.card__dot {
+  position: absolute;
+  top: 14px; right: 14px;
+  z-index: 4;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  background: rgba(10, 7, 2, 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: border-color 0.25s, background-color 0.25s, box-shadow 0.25s;
+}
+.plan.is-selected .card__dot {
+  border-color: var(--amber);
+  background: var(--amber);
+  box-shadow: 0 0 0 4px rgba(255, 172, 2, 0.22);
+}
+
+/* ---------- Texte (blanc) par-dessus l'image ----------
+   Un léger voile sombre haut + bas garantit la lisibilité du texte
+   blanc même sur les zones claires des tableaux (ciel de Turner,
+   or de Klimt). */
+.card__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+  color: #fff;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.12) 24%,
+    transparent 46%, transparent 58%,
+    rgba(0, 0, 0, 0.60) 100%
+  );
+}
+.card__head { display: flex; flex-direction: column; gap: 2px; }
+.card__name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.7));
+}
+.card__price {
+  display: flex; align-items: baseline; gap: 0.25rem;
+  color: #fff;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.75));
+}
+.card__price b { font-size: 1.75rem; font-weight: 700; }
+.card__price span { font-size: 0.95rem; opacity: 0.82; }
+
+.card__feats { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+.card__feats li {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.8rem;
+  letter-spacing: -0.01em;
+  color: #fff;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+}
+.card__feats li::before { content: "· "; color: #fff; opacity: 0.85; }
+
+/* ---------- CTA (sous la carte) ---------- */
+.cta {
+  width: 100%;
+  padding: 0.72rem 1rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background-color 0.25s, border-color 0.25s, color 0.25s;
+}
+.cta:hover { border-color: rgba(255, 172, 2, 0.5); }
+.plan.is-selected .cta {
+  background: var(--amber);
+  color: #170d02;
+  border-color: var(--amber);
+}
+
+.foot { margin-top: 2rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) { .plans { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .plans { grid-template-columns: 1fr; } }
+
+/* ---------- Accessibilité : pas de mouvement ----------
+   Le JS coupe le rAF et dessine une image fixe ; on fige aussi la
+   bordure (pas d'animation de flux). */
+@media (prefers-reduced-motion: reduce) {
+  .card, .card__arc, .cta { transition: none; }
+  .card__arc { animation: none; }
+  .card:hover { transform: none; }
+}

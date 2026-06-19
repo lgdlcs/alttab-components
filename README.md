@@ -2,7 +2,7 @@
 
 Petite collection de composants web **autonomes et sans dépendance** : du HTML, du CSS et du JavaScript *vanilla*, rien d'autre. Chaque composant tient dans un seul dossier, se copie-colle tel quel et fonctionne en ouvrant simplement son `index.html`. Pensés pour être réutilisés sur les sites [Alt-Tab Studio](https://github.com/lgdlcs).
 
-> Le fil rouge : des micro-interactions **pilotées par le scroll**, fluides, accessibles, et faciles à relire (chaque moteur fait ~30 lignes).
+> Le fil rouge : des micro-interactions **pilotées par le geste** (scroll ou pointeur), fluides, accessibles, et qui dégradent proprement.
 
 ---
 
@@ -35,12 +35,28 @@ Une barre de navigation pleine largeur qui se **rétracte en pilule flottante fr
 cd floating-pill-navbar && python3 -m http.server 8001   # puis http://localhost:8001
 ```
 
+### 3 · Glitch plan cards
+
+![Glitch plan cards — la bordure s'allume au survol et l'image se déchire (datamosh + aberration chromatique) quand la souris bouge](docs/glitch-plan-cards.gif)
+
+Des **cartes de tarifs** (Free / Plus / Super / Ultra) reprises du portail [Nous Research](https://portal.nousresearch.com/manage-subscription). Deux effets : une **bordure dégradée au survol**, et surtout l'image de la carte qui **se déchire quand on bouge la souris** (*datamosh* : déplacement par bandes + aberration chromatique), rendu par un **shader WebGL**.
+
+- **Le shader** (WebGL *brut*, vertex + fragment repris à l'identique du bundle de Nous) : la texture est découpée en **12 bandes horizontales** ; chacune se décale selon la **vitesse du curseur** (uniform `vel`), avec séparation RVB (aberration chromatique) et scanlines. Plus on bouge vite, plus ça déchire ; à l'arrêt, l'image se recompose.
+- **Le piège** : le handler souris **n'écrit jamais dans le DOM** — il pose `mx`/`my` dans un objet d'état, relu à chaque frame pour nourrir les uniforms (vitesse lissée, force par bande). Aucune mutation de style : l'effet est **invisible aux DevTools**, ce qui le rend déroutant à rétro-concevoir (il a fallu lire le bundle).
+- **La bordure « arc »** (le survol) : un dégradé multi-bandes masqué en anneau de 1,4 px (`mask-composite: exclude`), **100 % CSS**.
+- **Le fond** : un **tableau du domaine public** par formule (Friedrich · Turner · Rembrandt · Klimt), embarqué dans `img/`, peint comme texture du shader. Repli sur une texture générée localement si le réseau échoue.
+- **Replis honnêtes** : pas de WebGL ou pas de GPU → l'image est peinte en **statique** (canvas 2D), exactement comme le `useGpuTier` de Nous. `prefers-reduced-motion` → image figée. `IntersectionObserver` + `visibilitychange` coupent le `rAF` hors écran.
+
+```bash
+cd glitch-plan-cards && python3 -m http.server 8002   # puis http://localhost:8002
+```
+
 ---
 
 ## 🎯 Principes communs
 
 - **Zéro dépendance** : pas de framework, pas de bundler, pas de librairie d'animation. On ouvre, ça marche.
-- **Piloté par le scroll** : écouteurs passifs + `requestAnimationFrame`, jamais de scroll-jacking (le scroll natif reste maître).
+- **Piloté par le geste** : écouteurs passifs (scroll, `pointermove`) + `requestAnimationFrame`, jamais de scroll-jacking (le scroll natif reste maître).
 - **Accessible** : chaque composant neutralise ses animations sous `prefers-reduced-motion: reduce`.
 - **Relisible** : le cœur logique de chaque composant tient dans un petit `script.js` commenté.
 
@@ -50,8 +66,22 @@ cd floating-pill-navbar && python3 -m http.server 8001   # puis http://localhost
 python3 -m http.server 8770
 # http://localhost:8770/pinned-scrollytelling/
 # http://localhost:8770/floating-pill-navbar/
+# http://localhost:8770/glitch-plan-cards/
 ```
 
 ---
 
-<sub>Pattern scrollytelling inspiré de <a href="https://thelma.pet/">thelma.pet</a>. Construit par Alt-Tab Studio.</sub>
+## ✅ Règle : un GIF par composant
+
+Chaque composant (un dossier avec un `index.html`) **doit** avoir un GIF de démo
+`docs/<composant>.gif` référencé dans ce README. C'est vérifié automatiquement :
+
+- **Localement** (hook pre-commit) : `git config core.hooksPath hooks` une fois, puis chaque `git commit` lance la vérif.
+- **En CI** (`.github/workflows/check-gifs.yml`) : bloque la PR / le push si un GIF manque.
+- **À la main** : `node scripts/check-component-gifs.mjs`.
+
+La génération du GIF n'est pas automatisée (navigateur + interaction) : la recette est dans [`scripts/gen-gif.md`](scripts/gen-gif.md).
+
+---
+
+<sub>Pattern scrollytelling inspiré de <a href="https://thelma.pet/">thelma.pet</a>. Effet des cartes repris de <a href="https://portal.nousresearch.com/manage-subscription">Nous Research</a>. Construit par Alt-Tab Studio.</sub>

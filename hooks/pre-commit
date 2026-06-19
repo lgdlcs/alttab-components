@@ -1,0 +1,11 @@
+#!/bin/sh
+# Règle de la galerie : chaque composant doit avoir son GIF de démo
+# (docs/<composant>.gif) référencé dans le README.
+# Activez ce hook avec :  git config core.hooksPath hooks
+root="$(git rev-parse --show-toplevel)"
+node "$root/scripts/check-component-gifs.mjs" || {
+  echo ""
+  echo "✖ Commit bloqué : il manque un GIF de démo pour un composant."
+  echo "  Voir scripts/gen-gif.md pour le générer, puis réessayez."
+  exit 1
+}

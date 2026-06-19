@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glitch Plan Cards — démo</title>
+  <meta name="description" content="Cartes de tarifs avec bordure dégradée au survol et image qui se datamosh (déchirure + aberration chromatique WebGL) au mouvement de la souris. Reproduction du portail Nous Research." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main class="wrap">
+    <header class="head">
+      <h1 class="head__title">Choisissez une formule</h1>
+      <p class="head__sub">Toutes les formules payantes incluent des crédits mensuels, l'accès à 300+ modèles et l'usage d'outils intégrés.</p>
+    </header>
+
+    <!-- ============ GRILLE (radiogroup) ============
+         Chaque carte = un <canvas> WebGL (l'image « art » qui se
+         déchire au mouvement de la souris) + une bordure dégradée
+         CSS (.card__arc, l'effet de SURVOL) + le texte par-dessus.
+         Le bouton CTA est sous la carte (comme sur Nous). -->
+    <section class="plans" id="plans" role="radiogroup" aria-label="Formules">
+
+      <div class="plan is-selected" data-default>
+        <button class="card" role="radio" aria-checked="true" type="button" data-tier="plus">
+          <span class="card__media" aria-hidden="true"><canvas class="card__gl"></canvas></span>
+          <span class="card__arc" aria-hidden="true"></span>
+          <span class="card__dot" aria-hidden="true"></span>
+          <div class="card__overlay">
+            <div class="card__head">
+              <span class="card__name">Plus</span>
+              <span class="card__price"><b>20 €</b><span>/mois</span></span>
+            </div>
+            <ul class="card__feats">
+              <li>300+ modèles</li>
+              <li>Usage d'outils hébergés</li>
+              <li>Limites de débit élevées</li>
+              <li>22 € de crédits / mois (+10 %)</li>
+              <li>Report plafonné à 10 €</li>
+            </ul>
+          </div>
+        </button>
+        <button class="cta" type="button">S'abonner</button>
+      </div>
+
+      <div class="plan">
+        <button class="card" role="radio" aria-checked="false" type="button" data-tier="free">
+          <span class="card__media" aria-hidden="true"><canvas class="card__gl"></canvas></span>
+          <span class="card__arc" aria-hidden="true"></span>
+          <span class="card__dot" aria-hidden="true"></span>
+          <div class="card__overlay">
+            <div class="card__head">
+              <span class="card__name">Free</span>
+              <span class="card__price"><b>0 €</b><span>/mois</span></span>
+            </div>
+            <ul class="card__feats">
+              <li>Accès aux modèles gratuits</li>
+              <li>Paiement à l'usage sur 300+ modèles</li>
+            </ul>
+          </div>
+        </button>
+        <button class="cta" type="button">Choisir</button>
+      </div>
+
+      <div class="plan">
+        <button class="card" role="radio" aria-checked="false" type="button" data-tier="super">
+          <span class="card__media" aria-hidden="true"><canvas class="card__gl"></canvas></span>
+          <span class="card__arc" aria-hidden="true"></span>
+          <span class="card__dot" aria-hidden="true"></span>
+          <div class="card__overlay">
+            <div class="card__head">
+              <span class="card__name">Super</span>
+              <span class="card__price"><b>100 €</b><span>/mois</span></span>
+            </div>
+            <ul class="card__feats">
+              <li>300+ modèles</li>
+              <li>Usage d'outils hébergés</li>
+              <li>Limites de débit supérieures</li>
+              <li>110 € de crédits / mois (+10 %)</li>
+              <li>Report plafonné à 50 €</li>
+            </ul>
+          </div>
+        </button>
+        <button class="cta" type="button">Choisir</button>
+      </div>
+
+      <div class="plan">
+        <button class="card" role="radio" aria-checked="false" type="button" data-tier="ultra">
+          <span class="card__media" aria-hidden="true"><canvas class="card__gl"></canvas></span>
+          <span class="card__arc" aria-hidden="true"></span>
+          <span class="card__dot" aria-hidden="true"></span>
+          <div class="card__overlay">
+            <div class="card__head">
+              <span class="card__name">Ultra</span>
+              <span class="card__price"><b>200 €</b><span>/mois</span></span>
+            </div>
+            <ul class="card__feats">
+              <li>300+ modèles</li>
+              <li>Usage d'outils hébergés</li>
+              <li>Limites de débit maximales</li>
+              <li>220 € de crédits / mois (+10 %)</li>
+              <li>Report plafonné à 100 €</li>
+            </ul>
+          </div>
+        </button>
+        <button class="cta" type="button">Choisir</button>
+      </div>
+
+    </section>
+
+    <p class="foot">Survolez une carte&nbsp;: la bordure s'allume. Bougez la souris dessus&nbsp;: l'image se déchire (datamosh + aberration chromatique, WebGL).</p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
