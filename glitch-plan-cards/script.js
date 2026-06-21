@@ -166,7 +166,29 @@
   function compile(gl, type, src) {
     var sh = gl.createShader(type);
     gl.shaderSource(sh, src); gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) { gl.deleteShader(sh); return null; }
     return sh;
+  }
+
+  /* Repli statique honnête : peint l'image en 2D quand le rendu WebGL n'est pas
+     disponible (pas de contexte, ou shader qui échoue à compiler / linker). Si le
+     canvas porte déjà un contexte WebGL, on le remplace par un clone pour pouvoir
+     obtenir un contexte 2D (un canvas ne donne qu'un seul type de contexte). */
+  function paintStatic(canvas, texCanvas, src) {
+    var target = canvas;
+    var ctx2d = target.getContext("2d");
+    if (!ctx2d && canvas.parentNode) {
+      var clone = canvas.cloneNode(false);
+      canvas.parentNode.replaceChild(clone, canvas);
+      target = clone;
+      ctx2d = target.getContext("2d");
+    }
+    if (!ctx2d) return;
+    target.width = TEX_W; target.height = TEX_H;
+    ctx2d.drawImage(texCanvas, 0, 0);
+    var im2 = new Image();
+    im2.onload = function () { coverDraw(ctx2d, im2, TEX_W, TEX_H); };
+    im2.src = src;
   }
 
   var TINT = [1.0, 0.69, 0.16]; // ambre
@@ -181,23 +203,24 @@
 
     var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
     if (!gl) {
-      // Pas de WebGL : on peint l'image en statique (fallback honnête).
-      // La texture procédurale sert de remplissage le temps du chargement.
-      var ctx2d = canvas.getContext("2d");
-      if (ctx2d) {
-        canvas.width = TEX_W; canvas.height = TEX_H;
-        ctx2d.drawImage(texCanvas, 0, 0);
-        var im2 = new Image();
-        im2.onload = function () { coverDraw(ctx2d, im2, TEX_W, TEX_H); };
-        im2.src = src;
-      }
+      // Pas de WebGL : repli statique honnête (la procédurale reste affichée
+      // le temps du chargement de l'image).
+      paintStatic(canvas, texCanvas, src);
       return null;
     }
 
+    var vsh = compile(gl, gl.VERTEX_SHADER, VERT);
+    var fsh = compile(gl, gl.FRAGMENT_SHADER, FRAG);
     var prog = gl.createProgram();
-    gl.attachShader(prog, compile(gl, gl.VERTEX_SHADER, VERT));
-    gl.attachShader(prog, compile(gl, gl.FRAGMENT_SHADER, FRAG));
-    gl.linkProgram(prog); gl.useProgram(prog);
+    if (vsh) gl.attachShader(prog, vsh);
+    if (fsh) gl.attachShader(prog, fsh);
+    gl.linkProgram(prog);
+    if (!vsh || !fsh || !gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      // Shader KO sur ce GPU : même promesse que "pas de WebGL", on peint en statique.
+      paintStatic(canvas, texCanvas, src);
+      return null;
+    }
+    gl.useProgram(prog);
 
     var buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
