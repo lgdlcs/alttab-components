@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ship or Die — hero pirate piloté au scroll</title>
+  <meta name="description" content="Réinterprétation 100% CSS/vanilla du hero scrollytelling « Ship or Die » : une tempête monte, le capitaine balance par-dessus bord le crew qui n'a pas shippé, splash, puis « SHIP … or DIE ». Tout est une fonction pure de la progression du scroll." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       LA SECTION ÉPINGLÉE
+       Conteneur très HAUT (.sod-section) = il crée la distance de scroll.
+       Son enfant .sod-pin (sticky, 100vh) reste collé pendant toute la
+       traversée. Le JS pose des variables CSS (--scene-progress, --storm…)
+       lues par le CSS. Tout est réversible (fonction pure de la position).
+       ============================================================ -->
+  <section class="sod-section" data-sod-section aria-label="Ship or Die — narration pirate au scroll">
+    <div class="sod-pin" data-sod-scene>
+
+      <!-- ============ DÉCOR (entièrement aria-hidden) ============ -->
+      <div class="sod-visuals" aria-hidden="true">
+
+        <!-- ciels croisés : le calme cède la place à l'orage (opacité = --storm-opacity) -->
+        <div class="sod-sky"></div>
+        <div class="sod-sky sod-sky--storm"></div>
+
+        <!-- lune (s'éteint quand l'orage arrive) -->
+        <div class="sod-moon"><span></span><span></span></div>
+
+        <!-- nuages chunky qui dérivent + s'assombrissent avec l'orage -->
+        <div class="sod-cloud sod-cloud--1"></div>
+        <div class="sod-cloud sod-cloud--2"></div>
+        <div class="sod-cloud sod-cloud--3"></div>
+
+        <!-- éclair (zigzag) + flash plein écran : opacité pilotée par --storm-strike -->
+        <div class="sod-lightning"></div>
+        <div class="sod-flash"></div>
+        <!-- scintillement ambiant : boucle CSS masquée par --storm-ambient -->
+        <div class="sod-ambient"></div>
+
+        <!-- pluie : 18 gouttes, dérive en boucle CSS, opacité globale = --rain-opacity -->
+        <div class="sod-rain">
+          <span style="--rl:4%;--rt:7%;--rh:14px;--ro:.5;--rd:0ms;--rdur:620ms;--rdx:-18vw"></span>
+          <span style="--rl:10%;--rt:-4%;--rh:18px;--ro:.42;--rd:-180ms;--rdur:760ms;--rdx:-21vw"></span>
+          <span style="--rl:17%;--rt:12%;--rh:12px;--ro:.38;--rd:-420ms;--rdur:680ms;--rdx:-24vw"></span>
+          <span style="--rl:24%;--rt:2%;--rh:20px;--ro:.46;--rd:-90ms;--rdur:830ms;--rdx:-27vw"></span>
+          <span style="--rl:32%;--rt:-8%;--rh:14px;--ro:.36;--rd:-520ms;--rdur:720ms;--rdx:-18vw"></span>
+          <span style="--rl:39%;--rt:15%;--rh:15px;--ro:.48;--rd:-260ms;--rdur:650ms;--rdx:-21vw"></span>
+          <span style="--rl:46%;--rt:3%;--rh:12px;--ro:.4;--rd:-610ms;--rdur:780ms;--rdx:-24vw"></span>
+          <span style="--rl:53%;--rt:-5%;--rh:18px;--ro:.44;--rd:-340ms;--rdur:700ms;--rdx:-27vw"></span>
+          <span style="--rl:61%;--rt:9%;--rh:14px;--ro:.5;--rd:-130ms;--rdur:840ms;--rdx:-18vw"></span>
+          <span style="--rl:68%;--rt:-2%;--rh:15px;--ro:.4;--rd:-480ms;--rdur:730ms;--rdx:-21vw"></span>
+          <span style="--rl:75%;--rt:13%;--rh:12px;--ro:.38;--rd:-720ms;--rdur:670ms;--rdx:-24vw"></span>
+          <span style="--rl:82%;--rt:5%;--rh:17px;--ro:.46;--rd:-230ms;--rdur:810ms;--rdx:-27vw"></span>
+          <span style="--rl:89%;--rt:-7%;--rh:14px;--ro:.42;--rd:-570ms;--rdur:690ms;--rdx:-18vw"></span>
+          <span style="--rl:96%;--rt:11%;--rh:15px;--ro:.44;--rd:-390ms;--rdur:760ms;--rdx:-21vw"></span>
+          <span style="--rl:7%;--rt:-10%;--rh:17px;--ro:.42;--rd:-310ms;--rdur:700ms;--rdx:-24vw"></span>
+          <span style="--rl:28%;--rt:18%;--rh:14px;--ro:.48;--rd:-690ms;--rdur:640ms;--rdx:-27vw"></span>
+          <span style="--rl:57%;--rt:-12%;--rh:18px;--ro:.44;--rd:-150ms;--rdur:780ms;--rdx:-18vw"></span>
+          <span style="--rl:92%;--rt:2%;--rh:17px;--ro:.46;--rd:-250ms;--rdur:720ms;--rdx:-24vw"></span>
+        </div>
+
+        <!-- ============ LA MER + LE NAVIRE ============ -->
+        <div class="sod-sea">
+          <!-- vague arrière (parallaxe lente) -->
+          <div class="sod-wave sod-wave--back"></div>
+
+          <!-- le navire (tangue ; il porte l'équipage) -->
+          <div class="sod-ship">
+            <div class="sod-ship__sail">
+              <span class="sod-ship__skull">☠</span>
+            </div>
+            <div class="sod-ship__mast"></div>
+            <div class="sod-ship__flag"></div>
+            <div class="sod-ship__hull"></div>
+            <div class="sod-ship__deck"></div>
+
+            <!-- équipage sur le pont -->
+            <div class="sod-crew">
+
+              <!-- le slacker : il glande, il n'a rien shippé -->
+              <div class="sod-figure sod-slacker">
+                <span class="sod-zzz">z</span>
+                <i class="sod-fig__head"></i>
+                <i class="sod-fig__torso"></i>
+                <i class="sod-fig__arm sod-fig__arm--l"></i>
+                <i class="sod-fig__arm sod-fig__arm--r"></i>
+                <i class="sod-fig__leg sod-fig__leg--l"></i>
+                <i class="sod-fig__leg sod-fig__leg--r"></i>
+              </div>
+
+              <!-- le capitaine : entre par la gauche, marche, puis balance -->
+              <div class="sod-figure sod-captain">
+                <i class="sod-fig__hat"></i>
+                <i class="sod-fig__head"></i>
+                <i class="sod-fig__torso"></i>
+                <i class="sod-fig__arm sod-fig__arm--l"></i>
+                <i class="sod-fig__arm sod-fig__arm--r"></i>
+                <i class="sod-fig__leg sod-fig__leg--l"></i>
+                <i class="sod-fig__leg sod-fig__leg--r"></i>
+              </div>
+
+              <!-- le corps qui chute (même silhouette que le slacker, bras écartés) -->
+              <div class="sod-figure sod-fall">
+                <i class="sod-fig__head"></i>
+                <i class="sod-fig__torso"></i>
+                <i class="sod-fig__arm sod-fig__arm--l"></i>
+                <i class="sod-fig__arm sod-fig__arm--r"></i>
+                <i class="sod-fig__leg sod-fig__leg--l"></i>
+                <i class="sod-fig__leg sod-fig__leg--r"></i>
+              </div>
+
+            </div><!-- /crew -->
+          </div><!-- /ship -->
+
+          <!-- vague avant (parallaxe rapide, passe DEVANT la coque) -->
+          <div class="sod-wave sod-wave--front"></div>
+
+          <!-- le splash, ancré au centre (comme le navire) → toujours aligné
+               sur le point de chute, et AU-DESSUS de la vague avant -->
+          <div class="sod-splash">
+            <span class="sod-splash__ring"></span>
+            <i style="--sx:-26px;--sy:-30px"></i>
+            <i style="--sx:-14px;--sy:-44px"></i>
+            <i style="--sx:0;--sy:-52px"></i>
+            <i style="--sx:14px;--sy:-44px"></i>
+            <i style="--sx:26px;--sy:-30px"></i>
+            <i style="--sx:-34px;--sy:-16px"></i>
+            <i style="--sx:34px;--sy:-16px"></i>
+          </div>
+        </div><!-- /sea -->
+      </div><!-- /visuals -->
+
+      <!-- ============ AVANT-PLAN : header + copie ============ -->
+      <div class="sod-stage">
+        <header class="sod-header">
+          <a href="#top" class="sod-brand" aria-label="Ship or Die — accueil">
+            <span class="sod-brand__icon">☠</span>
+            <span class="sod-brand__text">
+              <strong>Ship or Die</strong>
+              <small>une réinterprétation Alt-Tab</small>
+            </span>
+          </a>
+          <nav class="sod-actions">
+            <a class="sod-link" href="#top">Dashboard</a>
+            <a class="sod-link sod-link--ghost" href="#top">Pricing</a>
+            <button class="sod-cta" type="button"><span>Join now</span></button>
+          </nav>
+        </header>
+
+        <div class="sod-copy">
+          <h1 class="sod-ship-word">SHIP</h1>
+
+          <!-- les deux lignes occupent la même zone et se croisent en fondu -->
+          <div class="sod-line">
+            <!-- amorce : se dissout quand la sentence tombe -->
+            <p class="sod-launch">
+              your app in 30 days
+              <span class="sod-cue" aria-hidden="true">
+                <span class="sod-cue__arrow">▾</span>
+                <span>scroll to start</span>
+              </span>
+            </p>
+
+            <!-- la sentence : monte en fondu pendant le largage -->
+            <div class="sod-consequence">
+              <strong>
+                <span class="sod-consequence__or">or</span>
+                <span class="sod-consequence__die">DIE</span>
+              </strong>
+              <span>miss the deadline, get kicked out forever.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HUD pédagogique : la valeur de progression, en direct -->
+      <output class="sod-hud" id="sodHud">progress 0.00 · storm 0.00 · scène 1/4</output>
+
+    </div><!-- /pin -->
+  </section>
+
+  <!-- ============ OUTRO pédagogique ============ -->
+  <footer class="sod-outro">
+    <h2 class="sod-outro__title">C'est tout le secret.</h2>
+    <p class="sod-outro__sub">
+      Un parent très haut, un enfant <code>sticky</code>, et chaque calque
+      (orage, pluie, capitaine, chute, splash, sentence) est une <strong>fonction
+      pure</strong> de la position de scroll. On remonte&nbsp;? Tout se rejoue à
+      l'envers, sans jamais se chevaucher. Ouvrez <code>script.js</code>.
+    </p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -51,6 +51,21 @@ Des **cartes de tarifs** (Free / Plus / Super / Ultra) reprises du portail [Nous
 cd glitch-plan-cards && python3 -m http.server 8002   # puis http://localhost:8002
 ```
 
+### 4 · Ship or Die hero
+
+![Ship or Die hero — au scroll, l'orage monte, le capitaine balance par-dessus bord le membre d'équipage qui n'a pas shippé, splash, puis « SHIP … or DIE »](docs/ship-or-die-hero.gif)
+
+Un **hero scrollytelling** entièrement **dessiné en CSS** (aucun asset) : on scrolle, une tempête s'installe (ciel qui noircit, nuages, pluie, éclairs, lune qui s'éteint), le **capitaine** débarque, marche jusqu'au membre d'équipage qui glande, le **balance par-dessus bord** (chute en parabole + vrille), **splash**, et la baseline bascule de « SHIP your app in 30 days » à « **or DIE**, miss the deadline, get kicked out forever ». Réinterprétation du hero de [Ship or Die](https://shipordie.com) (Marc Lou & Jack Friks).
+
+- **Le pattern** : comme les autres scrollytelling, un parent très haut (`600vh`) et un enfant `position: sticky; height: 100vh` collé. Le JS pose des **variables CSS** sur la scène (`--storm-opacity`, `--captain-x`, `--fall-y`, `--splash-scale`…) à chaque frame ; tout le rendu (transforms, opacités) vit dans le CSS.
+- **Anti-glitch** : chaque calque est une **fonction pure** de la progression. Les éclairs sont des `pulse()` nets centrés sur des positions de scroll précises, donc en remontant ils se rejouent à l'envers, jamais de chevauchement.
+- **Tout est CSS** : le galion (coque, mât, voile à tête de mort, pavillon), les personnages pixel (tête/torse/bras/jambes), les vagues festonnées (masque radial en parallaxe), la pluie et le splash. Zéro image.
+- **Ambiances en boucle** : dérive des nuages, tangage du navire, marche du capitaine, `Zzz` du glandeur, des animations CSS infinies juste révélées par l'opacité pilotée au scroll. Respecte `prefers-reduced-motion` (composition figée).
+
+```bash
+cd ship-or-die-hero && python3 -m http.server 8003   # puis http://localhost:8003
+```
+
 ---
 
 ## 🎯 Principes communs
@@ -67,6 +82,7 @@ python3 -m http.server 8770
 # http://localhost:8770/pinned-scrollytelling/
 # http://localhost:8770/floating-pill-navbar/
 # http://localhost:8770/glitch-plan-cards/
+# http://localhost:8770/ship-or-die-hero/
 ```
 
 ---
@@ -84,4 +100,4 @@ La génération du GIF n'est pas automatisée (navigateur + interaction) : la re
 
 ---
 
-<sub>Pattern scrollytelling inspiré de <a href="https://thelma.pet/">thelma.pet</a>. Effet des cartes repris de <a href="https://portal.nousresearch.com/manage-subscription">Nous Research</a>. Construit par Alt-Tab Studio.</sub>
+<sub>Pattern scrollytelling inspiré de <a href="https://thelma.pet/">thelma.pet</a>. Effet des cartes repris de <a href="https://portal.nousresearch.com/manage-subscription">Nous Research</a>. Hero pirate réinterprété de <a href="https://shipordie.com">Ship or Die</a> (Marc Lou &amp; Jack Friks). Construit par Alt-Tab Studio.</sub>
