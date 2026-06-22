@@ -66,6 +66,20 @@ Un **hero scrollytelling** entièrement **dessiné en CSS** (aucun asset) : on s
 cd ship-or-die-hero && python3 -m http.server 8003   # puis http://localhost:8003
 ```
 
+### 5 · Dot grid repel
+
+![Dot grid repel — une grille de points façon hero ; les points se repoussent autour du curseur](docs/dot-grid-repel.gif)
+
+Un **background de hero** : une grille de points (#8b92fb) sous un glow radial, dont les points **se repoussent autour du curseur** (un « trou » qui suit la souris, avec un anneau plus dense au bord). Repris du hero de [redreplier.com](https://redreplier.com/fr) — dont l'original est un `<canvas>` non copiable, donc reconstruit.
+
+- **Le pattern** : le décor est un `<canvas>` où chaque point est repoussé dans la direction opposée au curseur, avec une force décroissante avec la distance et un **easing au retour**. Le handler `pointermove` ne fait que stocker la position ; tout le reste est du dessin canvas en `requestAnimationFrame` (aucune écriture DOM).
+- **Fallback** : une version **100 % CSS** (grille en `radial-gradient` répété + glow par `mask`) s'affiche sans JS et sous `prefers-reduced-motion` ; le canvas la masque dès qu'il prend la main.
+- **Sobre** : le `rAF` est coupé hors écran (`IntersectionObserver`) et onglet caché, rendu net en `devicePixelRatio`.
+
+```bash
+cd dot-grid-repel && python3 -m http.server 8004   # puis http://localhost:8004
+```
+
 ---
 
 ## 🎯 Principes communs
@@ -83,6 +97,7 @@ python3 -m http.server 8770
 # http://localhost:8770/floating-pill-navbar/
 # http://localhost:8770/glitch-plan-cards/
 # http://localhost:8770/ship-or-die-hero/
+# http://localhost:8770/dot-grid-repel/
 ```
 
 ---

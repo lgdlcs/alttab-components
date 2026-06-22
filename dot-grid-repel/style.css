@@ -1,0 +1,72 @@
+/* ============================================================
+   Background du hero de redreplier.com — recréation 100% CSS.
+
+   L'original est un <canvas> animé (grille de points qui scintillent
+   sous un glow radial). Le canvas n'étant pas copiable, on le reproduit
+   ici en CSS pur : une grille de points (radial-gradient répété) masquée
+   par un dégradé radial pour le glow haut-centre. Léger, scalable,
+   animable, zéro JS, zéro image.
+
+   Couleur des points = couleur de marque #8b92fb (la même que le dégradé
+   du titre). Pas de grille mesuré sur le canvas ≈ 16px.
+   ============================================================ */
+
+:root {
+  --rr-brand: 139, 146, 251;   /* #8b92fb en RGB, pour jouer sur l'alpha */
+  --rr-dot-gap: 16px;          /* pas de la grille */
+  --rr-dot-size: 2px;          /* rayon visuel du point */
+}
+
+.rr-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* les deux calques de fond se superposent, derrière le contenu */
+.rr-hero__bg { position: absolute; inset: 0; z-index: 0; }
+
+/* (1) FALLBACK CSS pur : grille de points + glow radial par masque.
+   Visible sans JS et sous prefers-reduced-motion. Le JS le masque dès
+   qu'il prend la main avec le canvas. */
+.rr-hero__bg--fallback {
+  background-image: radial-gradient(
+    circle,
+    rgba(var(--rr-brand), 0.55) var(--rr-dot-size),
+    transparent calc(var(--rr-dot-size) + 0.4px)
+  );
+  background-size: var(--rr-dot-gap) var(--rr-dot-gap);
+  -webkit-mask-image: radial-gradient(125% 85% at 50% 22%, #000 0%, rgba(0, 0, 0, 0.45) 38%, transparent 72%);
+          mask-image: radial-gradient(125% 85% at 50% 22%, #000 0%, rgba(0, 0, 0, 0.45) 38%, transparent 72%);
+}
+
+/* (2) CANVAS : même grille + glow, dessinée par script.js, avec la
+   répulsion des points autour du curseur (l'effet de hover). */
+.rr-hero__bg--canvas { pointer-events: none; }
+
+/* ---------- démo : un peu de contenu par-dessus ---------- */
+.rr-hero__content {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 18vh 24px;
+  text-align: center;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.rr-hero__content h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: #0b0b14;
+  margin: 0 0 1rem;
+}
+.rr-hero__content h1 .accent {
+  background: linear-gradient(to right, #0b0b14 50%, rgb(var(--rr-brand)) 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+}
+.rr-hero__content p { color: #555; font-size: 1.1rem; margin: 0; }

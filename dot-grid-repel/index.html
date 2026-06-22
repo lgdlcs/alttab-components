@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dot grid repel — grille de points qui se repoussent au curseur</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Background du hero de redreplier.com.
+       - Fallback CSS pur (.rr-hero__bg--fallback) : grille de points + glow,
+         visible sans JS et sous prefers-reduced-motion.
+       - Canvas (.rr-hero__bg--canvas) : même grille + glow, MAIS les points
+         sont repoussés autour du curseur (l'effet de hover de l'original).
+       Pour réutiliser : colle les deux calques + script.js dans n'importe
+       quel conteneur en position:relative/isolate. -->
+  <section class="rr-hero">
+    <div class="rr-hero__bg rr-hero__bg--fallback" aria-hidden="true"></div>
+    <canvas class="rr-hero__bg rr-hero__bg--canvas" aria-hidden="true"></canvas>
+
+    <div class="rr-hero__content">
+      <h1>Le background du hero,<br /><span class="accent">avec l'effet de hover</span></h1>
+      <p>Grille de points #8b92fb + glow radial, et les points se <strong>repoussent</strong> autour du curseur. Passe la souris dessus.</p>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
